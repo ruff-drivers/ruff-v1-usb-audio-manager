@@ -82,7 +82,7 @@ function AlsaPlayback(options, _alsa) {
 util.inherits(AlsaPlayback, EE);
 
 
-AlsaPlayback.prototype.feed = function(buf) {
+AlsaPlayback.prototype.feed = function (buf) {
     if (this._pcmBuffers.length >= this._highWaterMark && this._waterMarkStatus !== 'fulled') {
         this._waterMarkStatus = 'fulled';
         this.emit('full');
