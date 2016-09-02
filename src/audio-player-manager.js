@@ -1,5 +1,3 @@
-//audio-player-manager.js
-
 'use strict';
 
 var kernelModule = require('kernel-module');
@@ -8,7 +6,6 @@ var fs = require('fs');
 var Dir = require('_file').Dir;
 
 var AudioPlayer = require('./audioPlayer');
-var DEV_PATH = '/dev/snd/';
 
 var DRIVER_NAME = 'snd_usb_audio';
 var SOUND_CHECK_PATH = '/sound';

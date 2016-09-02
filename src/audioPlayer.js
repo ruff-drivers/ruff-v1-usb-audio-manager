@@ -1,6 +1,3 @@
-//audioPlayer.js
-/* jshint -W097 */
-/* jshint node: true */
 'use strict';
 
 var EE = require('events');
@@ -11,25 +8,20 @@ var fs = require('fs');
 
 function AudioPlayer(options) {
     EE.call(this);
-    console.log("options.dev:", options.dev);
-    // if(!options || !options.decoder){
-    //     throw new Error('player options must assign a decoder object');
-    // }
     this._options = {
-        card : options && options.dev || '0,0',
-        bit : 16
+        card: options && options.dev || '0,0',
+        bit: 16
     };
     this._decoder = options.decoder;
     this._player = null;
 }
 util.inherits(AudioPlayer, EE);
 
-
-AudioPlayer.prototype.setDecoder = function(decoder) {
+AudioPlayer.prototype.setDecoder = function (decoder) {
     this._decoder = decoder;
 };
 
-AudioPlayer.prototype.play = function(path) {
+AudioPlayer.prototype.play = function (path) {
     var self = this;
     if (this._playing) {
         this.stop();
@@ -40,33 +32,33 @@ AudioPlayer.prototype.play = function(path) {
         highWaterMark: 2 * 1024
     });
 
-    this._stream.on('data', function(data) {
+    this._stream.on('data', function (data) {
         self._decoder.decode(data);
     });
 
-    this._decoder.on('format', function(format) {
+    this._decoder.on('format', function (format) {
         self._alsa = new Playback({
             card: format.card,
             channels: format.channels,
             rate: format.rate,
-            bits: format.bits,
+            bits: format.bits
         });
 
-        self._alsa.on("full", function() {
+        self._alsa.on('full', function () {
             self._stream.pause();
         });
 
-        self._alsa.on("drain", function() {
+        self._alsa.on('drain', function () {
             self._stream.resume();
         });
 
-        self._decoder.on('data', function(data) {
+        self._decoder.on('data', function (data) {
             self._alsa.feed(data);
         });
     });
 };
 
-AudioPlayer.prototype.pause = function() {
+AudioPlayer.prototype.pause = function () {
     if (this._stream) {
         this._stream.pause();
     }
@@ -74,18 +66,16 @@ AudioPlayer.prototype.pause = function() {
     this._playing = false;
 };
 
-AudioPlayer.prototype.resume = function() {
+AudioPlayer.prototype.resume = function () {
     if (this._stream) {
         this._stream.resume();
         this._playing = true;
     }
 };
 
-AudioPlayer.prototype.stop = function() {
+AudioPlayer.prototype.stop = function () {
     this._stream = null;
     this._playing = false;
 };
 
-
 module.exports = AudioPlayer;
-

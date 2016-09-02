@@ -1,5 +1,3 @@
-//audio-capture-manager.js
-
 'use strict';
 
 var kernelModule = require('kernel-module');
@@ -7,10 +5,9 @@ var usbDevice = require('device-manager');
 var fs = require('fs');
 var Dir = require('_file').Dir;
 
-var Audio = require('./audioCapture');
-var DEV_PATH = '/dev/snd/';
+var AudioCapture = require('./audioCapture');
 
-var DRIVER_NAME = 'snd_usb_audio'
+var DRIVER_NAME = 'snd_usb_audio';
 var SOUND_CHECK_PATH = '/sound';
 var cardNameRegExp = /card[0-9]+/;
 var pcmDevNameRegExp = /pcmC([0-9]+)D([0-9])c/;
@@ -66,7 +63,7 @@ var prototype = {
     createDevice: function (devPath) {
         var devInfo = checkAvailable(devPath);
         if (devInfo !== null) {
-            return Alsa.Capture({
+            return new AudioCapture({
                 dev: devInfo
             });
         }

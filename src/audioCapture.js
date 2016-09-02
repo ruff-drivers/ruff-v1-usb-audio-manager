@@ -1,6 +1,3 @@
-//audioCapture.js
-/* jshint -W097 */
-/* jshint node: true */
 'use strict';
 
 var EE = require('events');
@@ -11,7 +8,7 @@ var Alsa = require('./alsa.js');
 function AudioCapture(options, _mock) {
     EE.call(this);
     this._options = {
-        card : options && options.dev || options.card || '0,0',
+        card: options && options.dev || options.card || '0,0'
     };
     this._recorder = null;
     this._captureMock = _mock || null;
@@ -19,7 +16,7 @@ function AudioCapture(options, _mock) {
 util.inherits(AudioCapture, EE);
 
 
-AudioCapture.prototype.start = function(options, callback) {
+AudioCapture.prototype.start = function (options, callback) {
     this._options.rate = options && options.rate || 48000;
     this._options.channels = options && options.channel || 1;
     this._options.bit = 16;
@@ -28,9 +25,9 @@ AudioCapture.prototype.start = function(options, callback) {
     }
 
     var self = this;
-    this._recorder.on('data', function(buffer) {
+    this._recorder.on('data', function (buffer) {
         if (callback) {
-            setImmediate(function() {
+            setImmediate(function () {
                 callback(buffer);
             });
         } else {
@@ -40,7 +37,7 @@ AudioCapture.prototype.start = function(options, callback) {
     this._recorder.startCapture();
 };
 
-AudioCapture.prototype.stop = function(options) {
+AudioCapture.prototype.stop = function () {
     if (this._recorder) {
         this._recorder.stop();
         this._recorder.close();
