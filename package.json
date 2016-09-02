@@ -38,6 +38,9 @@
     "ruff": {
         "devDependencies": {
             "t": "^0.1.7"
+        },
+        "dependencies": {
+            "usb-manager": "^0.1.0"
         }
     }
 }
