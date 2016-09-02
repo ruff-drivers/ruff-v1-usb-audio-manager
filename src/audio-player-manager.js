@@ -1,11 +1,12 @@
 'use strict';
 
 var kernelModule = require('kernel-module');
-var usbDevice = require('device-manager');
+var usbDevice = require('usb-manager');
 var fs = require('fs');
 var Dir = require('_file').Dir;
 
 var AudioPlayer = require('./audioPlayer');
+var DEV_PATH = '/dev/snd/';
 
 var DRIVER_NAME = 'snd_usb_audio';
 var SOUND_CHECK_PATH = '/sound';
@@ -67,7 +68,6 @@ var prototype = {
                 dev: devInfo
             });
         }
-
         return null;
     }
 };

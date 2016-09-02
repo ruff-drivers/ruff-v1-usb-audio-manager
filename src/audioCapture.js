@@ -2,47 +2,77 @@
 
 var EE = require('events');
 var util = require('util');
-var Alsa = require('./alsa.js');
 
 
-function AudioCapture(options, _mock) {
+var STATES = {
+    IDLE: 0,
+    WRITING: 1,
+    READING: 2,
+    CLOSE: 3
+};
+
+var MODES = {
+    PCM_OUT: 0x00000000,
+    PCM_IN: 0x10000000
+};
+
+function AudioCapture(options, _alsa) {
     EE.call(this);
-    this._options = {
-        card: options && options.dev || options.card || '0,0'
-    };
-    this._recorder = null;
-    this._captureMock = _mock || null;
+    this._alsa = _alsa || require('./alsa.so');
+    this._card = options && options.dev || '0,0';
+    this._options = options;
+    this._handle = null;
+    this._state = STATES.IDLE;
+    this._read = this._read.bind(this);
+    this._doCapture = false;
 }
 util.inherits(AudioCapture, EE);
 
 
-AudioCapture.prototype.start = function (options, callback) {
-    this._options.rate = options && options.rate || 48000;
-    this._options.channels = options && options.channel || 1;
-    this._options.bit = 16;
-    if (!this._recorder) {
-        this._recorder = this._captureMock || new Alsa.Capture(this._options, this._mock);
-    }
 
+AudioCapture.prototype._read = function () {
+    if (this._doCapture === false) {
+        return;
+    }
+    this._state = STATES.READING;
     var self = this;
-    this._recorder.on('data', function (buffer) {
-        if (callback) {
-            setImmediate(function () {
-                callback(buffer);
-            });
-        } else {
-            self.emit('data', buffer);
+    this._alsa.read(this._handle, function (err, buffer) {
+        if (self._doCapture) {
+            self.emit('data', new Buffer(buffer));
+            process.nextTick(self._read);
         }
     });
-    this._recorder.startCapture();
+};
+
+AudioCapture.prototype.start = function (options) {
+    if (!this._handle) {
+        var _options = options || this._options;
+        this._handle = this._alsa.open(
+                        this._card,
+                        _options.channels,
+                        _options.rate,
+                        _options.bits,
+                        MODES.PCM_IN);
+    }
+
+    this._doCapture = true;
+    if (this._state === STATES.IDLE) {
+        process.nextTick(this._read);
+    }
 };
 
 AudioCapture.prototype.stop = function () {
-    if (this._recorder) {
-        this._recorder.stop();
-        this._recorder.close();
-        this._recorder = null;
-    }
+    this._doCapture = false;
+    this._state = STATES.IDLE;
 };
+
+
+AudioCapture.prototype.close = function () {
+    this.stop();
+    this._alsa.close(this._handle);
+    this._state = STATES.CLOSE;
+    this._handle = null;
+};
+
 
 module.exports = AudioCapture;

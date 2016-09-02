@@ -1,7 +1,7 @@
 'use strict';
 
 var kernelModule = require('kernel-module');
-var usbDevice = require('device-manager');
+var usbDevice = require('usb-manager');
 var fs = require('fs');
 var Dir = require('_file').Dir;
 
@@ -45,6 +45,7 @@ function checkAvailable(devPath) {
 
 var prototype = {
     attach: function (callback) {
+        console.log('capture attach');
         try {
             kernelModule.install(DRIVER_NAME);
             callback && callback();
@@ -53,6 +54,7 @@ var prototype = {
         }
     },
     detach: function (callback) {
+        console.log('capture detach');
         try {
             kernelModule.remove(DRIVER_NAME);
             callback && callback();
