@@ -12,8 +12,8 @@ var STATES = {
 };
 
 var MODES = {
-    PCM_OUT: 0x00000000,
-    PCM_IN: 0x10000000
+     PCM_OUT : 0x00000000,
+     PCM_IN : 0x10000000
 };
 
 function AudioCapture(options, _alsa) {
@@ -26,17 +26,17 @@ function AudioCapture(options, _alsa) {
     this._read = this._read.bind(this);
     this._doCapture = false;
 }
-util.inherits(AudioCapture, EE);
+util.inherits(AudioCapture, EE); //alsa 继承了EE，alsa就有emit
 
 
 
-AudioCapture.prototype._read = function () {
+AudioCapture.prototype._read = function() {
     if (this._doCapture === false) {
         return;
     }
     this._state = STATES.READING;
     var self = this;
-    this._alsa.read(this._handle, function (err, buffer) {
+    this._alsa.read(this._handle, function(err, buffer) {
         if (self._doCapture) {
             self.emit('data', new Buffer(buffer));
             process.nextTick(self._read);
@@ -44,30 +44,30 @@ AudioCapture.prototype._read = function () {
     });
 };
 
-AudioCapture.prototype.start = function (options) {
-    if (!this._handle) {
+AudioCapture.prototype.start = function(options) {
+    if(!this._handle){
         var _options = options || this._options;
         this._handle = this._alsa.open(
                         this._card,
                         _options.channels,
                         _options.rate,
                         _options.bits,
-                        MODES.PCM_IN);
+                        MODES.PCM_IN);    
     }
-
+    
     this._doCapture = true;
     if (this._state === STATES.IDLE) {
         process.nextTick(this._read);
     }
 };
 
-AudioCapture.prototype.stop = function () {
+AudioCapture.prototype.stop = function() {
     this._doCapture = false;
     this._state = STATES.IDLE;
 };
 
 
-AudioCapture.prototype.close = function () {
+AudioCapture.prototype.close = function() {
     this.stop();
     this._alsa.close(this._handle);
     this._state = STATES.CLOSE;

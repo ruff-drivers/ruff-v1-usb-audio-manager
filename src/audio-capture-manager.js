@@ -1,3 +1,5 @@
+//audio-capture-manager.js
+
 'use strict';
 
 var kernelModule = require('kernel-module');
@@ -6,8 +8,9 @@ var fs = require('fs');
 var Dir = require('_file').Dir;
 
 var AudioCapture = require('./audioCapture');
+var DEV_PATH = '/dev/snd/';
 
-var DRIVER_NAME = 'snd_usb_audio';
+var DRIVER_NAME = 'snd_usb_audio'
 var SOUND_CHECK_PATH = '/sound';
 var cardNameRegExp = /card[0-9]+/;
 var pcmDevNameRegExp = /pcmC([0-9]+)D([0-9])c/;
@@ -45,7 +48,6 @@ function checkAvailable(devPath) {
 
 var prototype = {
     attach: function (callback) {
-        console.log('capture attach');
         try {
             kernelModule.install(DRIVER_NAME);
             callback && callback();
@@ -54,7 +56,6 @@ var prototype = {
         }
     },
     detach: function (callback) {
-        console.log('capture detach');
         try {
             kernelModule.remove(DRIVER_NAME);
             callback && callback();
