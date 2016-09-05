@@ -32,7 +32,6 @@ util.inherits(AudioPlayer, EE);
 
 
 AudioPlayer.prototype.start = function (options) {
-    // console.log('player start');
     if (!this._handle) {
         var _options = options || this._options;
         this._handle = this._alsa.open(
@@ -54,7 +53,7 @@ AudioPlayer.prototype.feed = function (buf) {
         this.emit('full');
     }
     this.offset += buf.length;
-    // console.log('Buffers.length:', this._pcmBuffers.length, 'write length:', this.offset);
+    
     if (this._state !== STATES.CLOSE) {
         this._pcmBuffers.push(util._toDuktapeBuffer(buf));
     }
@@ -99,7 +98,6 @@ AudioPlayer.prototype.close = function (callback) {
 
     function onEnd() {
         self._alsa.close(self._handle);
-        self._state = STATES.CLOSE;
         self._handle = null;
         self.removeListener('end', onEnd);
         callback && callback();
