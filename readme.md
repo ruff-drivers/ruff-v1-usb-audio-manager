@@ -1,6 +1,6 @@
-# Alsa Audio Driver for Ruff
+# USB Audio Driver for Ruff
 
-This driver module provides audio device capture and playback feature for Ruff.
+This driver module provides usb audio device capture and playback feature for Ruff.
 
 ##Supported Engines
 
@@ -11,66 +11,101 @@ This driver module provides audio device capture and playback feature for Ruff.
 Execute following command to install
 
 ```
-rap install alsa
+rap init
+rap install ruff-v1-usb-audio-manager@https://github.com/ruff-drivers/ruff-v1-usb-audio-manager
 ```
 
 
 ##Usage
 
-Alsa has 2 working mode, Capture mode and Playback mode. Capture mode read data from audio device, and Playback mode write data to audio device.
-###Capture mode
+Audio Driver has 2 working mode, Capture mode and Playback mode. Capture mode read data from audio device, and Playback mode write data to audio device.
+
+For initialize the hardware correctly, there is an AudioCaptureManager and an AudioPlayerManager to help you, Manager objects should be installed before.
+
 ```
-var Alsa = require('alsa');
-var fs = require('fs');
+var AudioCaptureManager = require('ruff-v1-usb-audio-manager').CaptureManager;
+var AudioPlayerManager = require('ruff-v1-usb-audio-manager').PlayerManager;
 
-var pcmOptions = {
-    card: '0,0',
-    channels: 1,
-    rate: 48000,
-    bits: 16
-};
+var captureManager = new AudioCaptureManager();
+var playerManager = new AudioPlayerManager();
 
-var fileWriteStream = fs.createWriteStream('/tmp/audio.raw');
+$('#usb').install(captureManager, playerManager);
 
-var capturer = new Alsa.Capture(pcmOptions);
-reader.on("data", function(buffer) {
-    fileWriteStream.write(buffer);
+
+```
+
+
+###Capture mode
+
+When usb audio device mount, CaptureManager will help you create capturer object automatically. The example show you how to record voice to a file last for 5 seconds.
+
+```
+var sampleFile = '/tmp/test.mono.pcm';
+
+captureManager.on('mount', function (capturer) {
+    console.log('AudioCard Capturer mount');
+    $('#button-k2').on('push', function () {
+        console.log('button-k2 push');
+
+        var fd = fs.openSync(sampleFile, 'w');
+        var offset = 0;
+
+        capturer.on('data', function (buffer) {
+            fs.writeSync(fd, buffer, 0, buffer.length, offset);
+            offset += buffer.length;
+        });
+
+        capturer.start({
+            rate: 44100,
+            channels: 1,
+            bits: 16
+        });
+
+        setTimeout(function () {
+            capturer.stop();
+            fs.closeSync(fd);
+            console.log('capture finished');
+        }, 5000);
+    });
 });
-
-reader.start();
-
-setTimeout(function() {
-    reader.stop();
-}, 5000);
 
 ```
 
 ###Playback mode
+
+When usb audio device mount, playerManager will help you create player object automatically. The example show you how to play the voice from a file.
+
 ```
-var Alsa = require('alsa');
-var fs = require('fs');
+playerManager.on('mount', function (player) {
+    console.log('AudioCard Player mount');
 
-var pcmOptions = {
-        card: '0,0',
-        channels: 1,
-        rate: 48000,
-        bits: 16
-    };
+    $('#button-k3').on('push', function () {
+        console.log('button-k3 push');
 
-var testfile = '/tmp/audio.raw';
-var player = new Alsa.Playback(pcmOptions); 
-var fileReadStream = fs.createReadStream(testfile);  
+        var fileReadStream = fs.createReadStream(sampleFile, { highWaterMark: 1024 * 2 });
+        player.on('full', function () {
+            fileReadStream.pause();
+        });
 
-player.on("full", function () {
-    fileReadStream.pause();
-});
+        player.on('drain', function () {
+            fileReadStream.resume();
+        });
 
-player.on( "drain", function () {
-    fileReadStream.resume();
-});
 
-fileReadStream.on('data', function(data){
-    player.feed(data);
+        fileReadStream.on('data', function (data) {
+            player.feed(data);
+        });
+
+        fileReadStream.on('close', function () {
+            player.close();
+        });
+
+        player.start({
+            rate: 44100,
+            channels: 1,
+            bits: 16
+        });
+    });
 });
 ```
 
@@ -87,10 +122,12 @@ options = {
     bits
 }
 ```
-* card is the audio card name and device name, like '0,0'. Audio-manager module could specify the name automaticlly as soon as the hardware was plugged, however You can specify the name manually.
-* channels is read or write audio tracks, by default, read is mono track, and write is stereo.
-* rate is the sample rate, the driver supports [8000, 16000, 441000, 48000] sample rate.
-* bits is the PCM audio bit depth, only supports 16bit so far.
+* *card* is the audio card name and device name, like '0,0'. Audio-Manager module could specify the name automaticlly as soon as the hardware was plugged, however You can specify the name manually.
+* *channels* is read or write audio tracks, by default, read is mono track, and write is stereo.
+* *rate* is the sample rate, the driver supports [8000, 16000, 441000, 48000] sample rate.
+* *bits* is the PCM audio bit depth, only supports 16bit so far.
+
+Options is the user media parameters, for example, your play voice is 44100Hz, 2channels, 16bits wav file, then options should be seted as it. If audio hardware not support the media parameters, it would throw an exception.
 
 
 ###Methods
@@ -99,10 +136,10 @@ options = {
 ```
 Capture(options)
 ```
-Create an Alsa Capture object.
+Create a capturer object.
 
 ```
-start()
+start(options)
 ```
 Start to read data from audio device continuously, until call stop()
 
@@ -110,31 +147,31 @@ Start to read data from audio device continuously, until call stop()
 ```
 stop()
 ```
-Stop to read data, until call start().
+Stop to capture data, until call start().
 
 
 ```
 close()
 ```
-close audio device, and can not start anymore. For restart to read, you should create a other Alsa Capture object.
+close audio device, and can not start anymore. For restart to read, you should create a other Capture object.
 
 ####Playback mode
 
 ```
 Playback(options)
 ```
-Create an Alsa Playback object.
+Create a player object.
 
 ```
 feed(buffer)
 ```
-feed buffer data to Alsa Writer.
+feed buffer data to player object.
 
 
 ```
 close()
 ```
-close audio device, and can not start anymore. For restart to write, you should create a other Alsa Playback object.
+Close audio device, and can not start anymore. For restart to write, you should create a other player object.
 
 
 ###Events
@@ -143,20 +180,20 @@ close audio device, and can not start anymore. For restart to write, you should 
 ```
 on('data', callback);
 ```
-hardware read audio data is asynchronous, once get enought data, will emit data event and trigger callback with audio data as an argument.
+Hardware read audio data is asynchronous, once get enought data, will emit data event and trigger callback with audio data as an argument.
 
 
 ####Playback mode
 ```
 on('drain', callback);
 ```
-If there is no more data feed to writer for a long time, it will emit drain event once, and you should better trigger outer feed object to give more data to writer.
+If there is no more data feed to player for a long time, it will emit drain event once, and you should better trigger outer feed object to give more data to writer.
 
 
 ```
 on('full', callback);
 ```
-If you put too much data to writer, it will emit full event once, and it suggests you stop feed data to writer temporarily. However, it just a suggestion to stop, not necessary.
+If you put too much data to player, it will emit full event once, and it suggests you stop feed data to player temporarily. However, it just a suggestion to stop, not necessary.
 
 
 
