@@ -1,6 +1,6 @@
-# USB Audio Driver for Ruff
+# USB Audio Manager for Ruff
 
-This driver module provides usb audio device capture and playback feature for Ruff.
+This module provides usb audio device capture and playback feature for Ruff.
 
 ##Supported Engines
 
