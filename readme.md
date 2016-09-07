@@ -12,7 +12,7 @@ Execute following command to install
 
 ```
 rap init
-rap install ruff-v1-usb-audio-manager@https://github.com/ruff-drivers/ruff-v1-usb-audio-manager
+rap install ruff-v1-usb-audio-manager
 ```
 
 
@@ -114,13 +114,16 @@ playerManager.on('mount', function (player) {
 
 ###Options
 
+The typical options example should like this:
+
 ```
 options = {
-    card, 
-    channels,
-    rate,
-    bits
+    card : '0,0', 
+    channels : 2,
+    rate : 44100,
+    bits : 16
 }
+
 ```
 * *card* is the audio card name and device name, like '0,0'. Audio-Manager module could specify the name automaticlly as soon as the hardware was plugged, however You can specify the name manually.
 * *channels* is read or write audio tracks, by default, read is mono track, and write is stereo.
@@ -129,72 +132,52 @@ options = {
 
 Options is the user media parameters, for example, your play voice is 44100Hz, 2channels, 16bits wav file, then options should be seted as it. If audio hardware not support the media parameters, it would throw an exception.
 
+###Capture mode
 
-###Methods
-####Capture mode
+####Methods
 
-```
-Capture(options)
-```
+
+####`Capture(options)`
 Create a capturer object.
 
-```
-start(options)
-```
+####`start(options)`
 Start to read data from audio device continuously, until call stop()
 
-
-```
-stop()
-```
+####`stop()`
 Stop to capture data, until call start().
 
-
-```
-close()
-```
+####`close()`
 close audio device, and can not start anymore. For restart to read, you should create a other Capture object.
 
-####Playback mode
+####Events
+####`on('data', callback);`
 
-```
-Playback(options)
-```
-Create a player object.
-
-```
-feed(buffer)
-```
-feed buffer data to player object.
-
-
-```
-close()
-```
-Close audio device, and can not start anymore. For restart to write, you should create a other player object.
-
-
-###Events
-
-####Capture mode
-```
-on('data', callback);
-```
 Hardware read audio data is asynchronous, once get enought data, will emit data event and trigger callback with audio data as an argument.
 
 
-####Playback mode
-```
-on('drain', callback);
-```
+###Playback mode
+####Methods
+
+####`Playback(options)`
+Create a player object.
+
+
+####`feed(buffer)`
+feed buffer data to player object.
+
+####`close()`
+
+Close audio device, and can not start anymore. For restart to write, you should create a other player object.
+
+####Events
+####`on('drain', callback);`
+
 If there is no more data feed to player for a long time, it will emit drain event once, and you should better trigger outer feed object to give more data to writer.
 
 
-```
-on('full', callback);
-```
-If you put too much data to player, it will emit full event once, and it suggests you stop feed data to player temporarily. However, it just a suggestion to stop, not necessary.
+####`on('full', callback);`
 
+If you put too much data to player, it will emit full event once, and it suggests you stop feed data to player temporarily. However, it just a suggestion to stop, not necessary.
 
 
 ##Contributing
