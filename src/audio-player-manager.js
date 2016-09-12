@@ -3,10 +3,8 @@
 var kernelModule = require('kernel-module');
 var usbDevice = require('usb-manager');
 var fs = require('fs');
-var Dir = require('_file').Dir;
 
 var AudioPlayer = require('./audioPlayer');
-var DEV_PATH = '/dev/snd/';
 
 var DRIVER_NAME = 'snd_usb_audio';
 var SOUND_CHECK_PATH = '/sound';
@@ -18,21 +16,19 @@ function checkAvailable(devPath) {
     var checkedPath = devPath + SOUND_CHECK_PATH;
     try {
         fs.statSync(checkedPath);
-        var dir = new Dir(checkedPath);
-        var items = dir.listSync(checkedPath);
+        var items = fs.readdirSync(checkedPath);
         var cardname = null;
         var pcmDevName = null;
         for (var i = 0; i < items.length; i++) {
-            if (cardNameRegExp.exec(items[i].name) !== null) {
-                cardname = items[i].name;
+            if (cardNameRegExp.exec(items[i]) !== null) {
+                cardname = items[i];
                 break;
             }
         }
         var soundPath = checkedPath + '/' + cardname;
-        dir = new Dir(soundPath);
-        items = dir.listSync(soundPath);
+        items = fs.readdirSync(soundPath);
         for (i = 0; i < items.length; i++) {
-            var result = pcmDevNameRegExp.exec(items[i].name);
+            var result = pcmDevNameRegExp.exec(items[i]);
             if (result !== null) {
                 pcmDevName = result[1] + ',' + result[2];
                 break;
