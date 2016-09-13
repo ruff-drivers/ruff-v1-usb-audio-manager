@@ -35,11 +35,15 @@ AlsaCapture.prototype._read = function () {
         return;
     }
     this._state = STATES.READING;
-    var self = this;
+    var that = this;
     this._alsa.read(this._handle, function (err, buffer) {
-        if (self._doCapture) {
-            self.emit('data', new Buffer(buffer));
-            process.nextTick(self._read);
+        if (err) {
+            throw new Error('read buffer error');
+        }
+
+        if (that._doCapture) {
+            that.emit('data', new Buffer(buffer));
+            process.nextTick(that._read);
         }
     });
 };
@@ -55,7 +59,6 @@ AlsaCapture.prototype.stop = function () {
     this._doCapture = false;
     this._state = STATES.IDLE;
 };
-
 
 AlsaCapture.prototype.close = function () {
     this.stop();
@@ -81,7 +84,6 @@ function AlsaPlayback(options, _alsa) {
 }
 util.inherits(AlsaPlayback, EE);
 
-
 AlsaPlayback.prototype.feed = function (buf) {
     if (this._pcmBuffers.length >= this._highWaterMark && this._waterMarkStatus !== 'fulled') {
         this._waterMarkStatus = 'fulled';
@@ -105,7 +107,6 @@ AlsaPlayback.prototype._write = function () {
 
     var buffer = this._pcmBuffers.shift();
     this._state = STATES.WRITING;
-    var self = this;
 
     this._alsa.write(this._handle, buffer, this._write);
 

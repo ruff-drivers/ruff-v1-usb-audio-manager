@@ -37,7 +37,7 @@ describe('Test for Capture Driver of Audio Device', function () {
 
     it('should done when init with valid params', function (done) {
         var _alsa = anyMock();
-        var capturer = new Alsa.Capture(pcmOptions, _alsa);
+        new Alsa.Capture(pcmOptions, _alsa);
         verify(_alsa, once()).open('0,0', 1, 48000, 16, 0x10000000);
         done();
     });
@@ -47,7 +47,7 @@ describe('Test for Capture Driver of Audio Device', function () {
         when(_alsa).open(any, any, any, any, any).thenThrow(new Error('error'));
 
         assert.throws(function () {
-            var capturer = new Alsa.Capture(pcmOptions, _alsa);
+            new Alsa.Capture(pcmOptions, _alsa);
         }, Error);
         done();
     });
@@ -71,7 +71,7 @@ describe('Test for Capture Driver of Audio Device', function () {
             }, 10);
         });
 
-        capturer.on('data', function (buffer) {
+        capturer.on('data', function () {
             assert(false);
         });
 
@@ -90,7 +90,7 @@ describe('Test for Capture Driver of Audio Device', function () {
             capturer.stop();
         }
         capturer.start();
-        capturer.once('data', function (buffer) {
+        capturer.once('data', function () {
             verify(alsaMock, once()).read(any, Function);
             done();
         });
@@ -132,7 +132,7 @@ describe('Test for Playback Driver of Audio Device', function () {
     });
 
     it('should emit fulled event when feed many data', function (done) {
-        player.once('full', function (buffer) {
+        player.once('full', function () {
             verify(alsaMock, atLeast(0)).write(any, any, Function);
             done();
         });
@@ -162,10 +162,10 @@ describe('Test for Playback Driver of Audio Device', function () {
     });
 
     it('closed would never emmit any event', function (done) {
-        player.on('full', function (buffer) {
+        player.on('full', function () {
             assert(false);
         });
-        player.on('drain', function (buffer) {
+        player.on('drain', function () {
             assert(false);
         });
         when(alsaMock).write(any, any, Function).then(function (any, buffer, callback) {
@@ -174,7 +174,8 @@ describe('Test for Playback Driver of Audio Device', function () {
 
         player.close();
 
-        for (var i = 0; i < 10; i++) {
+        var i;
+        for (i = 0; i < 10; i++) {
             player.feed(buffer);
         }
         for (i = 0; i < player._highWaterMark * 2; i++) {

@@ -1,4 +1,4 @@
-//audio-capture-manager.js
+// audio-capture-manager.js
 
 'use strict';
 
@@ -8,11 +8,10 @@ var fs = require('fs');
 
 var AudioCapture = require('./audioCapture');
 
-var DRIVER_NAME = 'snd_usb_audio'
+var DRIVER_NAME = 'snd_usb_audio';
 var SOUND_CHECK_PATH = '/sound';
 var cardNameRegExp = /card[0-9]+/;
 var pcmDevNameRegExp = /pcmC([0-9]+)D([0-9])c/;
-
 
 function checkAvailable(devPath) {
     var checkedPath = devPath + SOUND_CHECK_PATH;
@@ -21,7 +20,8 @@ function checkAvailable(devPath) {
         var items = fs.readdirSync(checkedPath);
         var cardname = null;
         var pcmDevName = null;
-        for (var i = 0; i < items.length; i++) {
+        var i;
+        for (i = 0; i < items.length; i++) {
             if (cardNameRegExp.exec(items[i]) !== null) {
                 cardname = items[i];
                 break;

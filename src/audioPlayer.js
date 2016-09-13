@@ -29,8 +29,6 @@ function AudioPlayer(options, _alsa) {
 }
 util.inherits(AudioPlayer, EE);
 
-
-
 AudioPlayer.prototype.start = function (options) {
     if (!this._handle) {
         var _options = options || this._options;
@@ -45,7 +43,6 @@ AudioPlayer.prototype.start = function (options) {
     }
 };
 
-
 AudioPlayer.prototype.feed = function (buf) {
     if (this._pcmBuffers.length >= this._highWaterMark &&
         this._waterMarkStatus !== 'fulled') {
@@ -53,7 +50,7 @@ AudioPlayer.prototype.feed = function (buf) {
         this.emit('full');
     }
     this.offset += buf.length;
-    
+
     if (this._state !== STATES.CLOSE) {
         this._pcmBuffers.push(util._toDuktapeBuffer(buf));
     }
@@ -76,13 +73,12 @@ AudioPlayer.prototype._write = function () {
 
     var buffer = this._pcmBuffers.shift();
     this._state = STATES.WRITING;
-    var self = this;
+    var that = this;
 
     // this._alsa.write( this._handle, buffer, this._write );
     this._alsa.write(this._handle, buffer, function () {
-        self._write();
+        that._write();
     });
-
 
     if (this._pcmBuffers.length <= this._lowWaterMark &&
     this._waterMarkStatus !== 'drained'
@@ -93,13 +89,13 @@ AudioPlayer.prototype._write = function () {
 };
 
 AudioPlayer.prototype.close = function (callback) {
-    var self = this;
-    self._state = STATES.CLOSE;
+    var that = this;
+    this._state = STATES.CLOSE;
 
     function onEnd() {
-        self._alsa.close(self._handle);
-        self._handle = null;
-        self.removeListener('end', onEnd);
+        that._alsa.close(that._handle);
+        that._handle = null;
+        that.removeListener('end', onEnd);
         callback && callback();
     }
 

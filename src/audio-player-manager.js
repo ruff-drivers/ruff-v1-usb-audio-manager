@@ -11,7 +11,6 @@ var SOUND_CHECK_PATH = '/sound';
 var cardNameRegExp = /card[0-9]+/;
 var pcmDevNameRegExp = /pcmC([0-9]+)D([0-9])p/;
 
-
 function checkAvailable(devPath) {
     var checkedPath = devPath + SOUND_CHECK_PATH;
     try {
@@ -19,7 +18,8 @@ function checkAvailable(devPath) {
         var items = fs.readdirSync(checkedPath);
         var cardname = null;
         var pcmDevName = null;
-        for (var i = 0; i < items.length; i++) {
+        var i;
+        for (i = 0; i < items.length; i++) {
             if (cardNameRegExp.exec(items[i]) !== null) {
                 cardname = items[i];
                 break;
