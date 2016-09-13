@@ -28,7 +28,7 @@
         "install-rap-dependencies": "rap install",
         "lint": "eslint .",
         "pretest": "npm run lint",
-        "test": "ruff ./test/test_alsa.js"
+        "test": "find test -name 'test*.js' | xargs ruff"
     },
     "devDependencies": {
         "eslint": "^2.13.1",
