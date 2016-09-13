@@ -1,3 +1,8 @@
+/*!
+ * Copyright (c) 2016 Nanchao Inc.
+ * All rights reserved.
+ */
+
 'use strict';
 var Alsa = require('../src/alsa.js');
 var assert = require('assert');
@@ -24,7 +29,6 @@ describe('Test for Capture Driver of Audio Device', function () {
     };
 
     beforeEach(function () {
-        // var alsaMock = ruffMock(mockTarget, true);
         alsaMock = anyMock();
         capturer = new Alsa.Capture(pcmOptions, alsaMock);
     });

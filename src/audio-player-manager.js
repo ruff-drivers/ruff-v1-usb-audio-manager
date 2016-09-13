@@ -1,3 +1,8 @@
+/*!
+ * Copyright (c) 2016 Nanchao Inc.
+ * All rights reserved.
+ */
+
 'use strict';
 
 var kernelModule = require('kernel-module');
@@ -16,18 +21,17 @@ function checkAvailable(devPath) {
     try {
         fs.statSync(checkedPath);
         var items = fs.readdirSync(checkedPath);
-        var cardname = null;
-        var pcmDevName = null;
-        var i;
-        for (i = 0; i < items.length; i++) {
-            if (cardNameRegExp.exec(items[i]) !== null) {
-                cardname = items[i];
-                break;
-            }
+        var cardName = items.find(function (element) {
+            return cardNameRegExp.exec(element) !== null;
+        });
+        if (cardName === null) {
+            return null;
         }
-        var soundPath = checkedPath + '/' + cardname;
+
+        var soundPath = checkedPath + '/' + cardName;
+        var pcmDevName = null;
         items = fs.readdirSync(soundPath);
-        for (i = 0; i < items.length; i++) {
+        for (var i = 0; i < items.length; i++) {
             var result = pcmDevNameRegExp.exec(items[i]);
             if (result !== null) {
                 pcmDevName = result[1] + ',' + result[2];

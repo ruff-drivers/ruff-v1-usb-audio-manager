@@ -1,4 +1,8 @@
-// audioPlayer.js
+/*!
+ * Copyright (c) 2016 Nanchao Inc.
+ * All rights reserved.
+ */
+
 'use strict';
 
 var EE = require('events');
@@ -7,14 +11,10 @@ var util = require('util');
 var STATES = {
     IDLE: 0,
     WRITING: 1,
-    READING: 2,
     CLOSE: 3
 };
 
-var MODES = {
-    PCM_OUT: 0x00000000,
-    PCM_IN: 0x10000000
-};
+var PCM_OUT_MODE = 0x00000000;
 
 function AudioPlayer(options, _alsa) {
     EE.call(this);
@@ -37,7 +37,7 @@ AudioPlayer.prototype.start = function (options) {
             _options.channels,
             _options.rate,
             _options.bits,
-            MODES.PCM_OUT);
+            PCM_OUT_MODE);
         this._state = STATES.IDLE;
         this._pcmBuffers = [];
     }
@@ -45,8 +45,8 @@ AudioPlayer.prototype.start = function (options) {
 
 AudioPlayer.prototype.feed = function (buf) {
     if (this._pcmBuffers.length >= this._highWaterMark &&
-        this._waterMarkStatus !== 'fulled') {
-        this._waterMarkStatus = 'fulled';
+        this._waterMarkStatus !== 'full') {
+        this._waterMarkStatus = 'full';
         this.emit('full');
     }
     this.offset += buf.length;

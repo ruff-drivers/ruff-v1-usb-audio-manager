@@ -1,3 +1,8 @@
+/*!
+ * Copyright (c) 2016 Nanchao Inc.
+ * All rights reserved.
+ */
+
 'use strict';
 
 var EE = require('events');
@@ -5,15 +10,11 @@ var util = require('util');
 
 var STATES = {
     IDLE: 0,
-    WRITING: 1,
     READING: 2,
     CLOSE: 3
 };
 
-var MODES = {
-    PCM_OUT: 0x00000000,
-    PCM_IN: 0x10000000
-};
+var PCM_IN_MODE = 0x10000000;
 
 function AudioCapture(options, _alsa) {
     EE.call(this);
@@ -25,7 +26,7 @@ function AudioCapture(options, _alsa) {
     this._read = this._read.bind(this);
     this._doCapture = false;
 }
-util.inherits(AudioCapture, EE); // alsa 继承了EE，alsa就有emit
+util.inherits(AudioCapture, EE);
 
 AudioCapture.prototype._read = function () {
     if (this._doCapture === false) {
@@ -53,7 +54,7 @@ AudioCapture.prototype.start = function (options) {
                         _options.channels,
                         _options.rate,
                         _options.bits,
-                        MODES.PCM_IN);
+                        PCM_IN_MODE);
     }
 
     this._doCapture = true;
