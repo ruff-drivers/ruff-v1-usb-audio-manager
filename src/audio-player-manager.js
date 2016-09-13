@@ -29,16 +29,14 @@ function checkAvailable(devPath) {
         }
 
         var soundPath = checkedPath + '/' + cardName;
-        var pcmDevName = null;
         items = fs.readdirSync(soundPath);
         for (var i = 0; i < items.length; i++) {
             var result = pcmDevNameRegExp.exec(items[i]);
             if (result !== null) {
-                pcmDevName = result[1] + ',' + result[2];
-                break;
+                return result[1] + ',' + result[2];
             }
         }
-        return pcmDevName;
+        return null;
     } catch (error) {
         return null;
     }

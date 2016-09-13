@@ -2,3 +2,5 @@
 /node_modules/
 /ruff_modules/
 /.ruff/
+.rap
+npm-debug.log
