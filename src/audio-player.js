@@ -25,7 +25,6 @@ function AudioPlayer(options, _alsa) {
     this._lowWaterMark = 16; // each frame
     this._highWaterMark = 64; // each frame
     this._write = this._write.bind(this);
-    this.offset = 0;
 }
 util.inherits(AudioPlayer, EE);
 
@@ -49,7 +48,6 @@ AudioPlayer.prototype.feed = function (buf) {
         this._waterMarkStatus = 'full';
         this.emit('full');
     }
-    this.offset += buf.length;
 
     if (this._state !== STATES.CLOSE) {
         this._pcmBuffers.push(util._toDuktapeBuffer(buf));
@@ -65,23 +63,26 @@ AudioPlayer.prototype._write = function () {
         return;
     }
 
-    if (this._pcmBuffers.length <= 0) {
+    if (this._pcmBuffers.length === 0) {
         this._state = STATES.IDLE;
         this.emit('end');
         return;
     }
 
-    var buffer = this._pcmBuffers.shift();
-    this._state = STATES.WRITING;
     var that = this;
+
+    this._state = STATES.WRITING;
+
+    var buffer = this._pcmBuffers.shift();
 
     // this._alsa.write( this._handle, buffer, this._write );
     this._alsa.write(this._handle, buffer, function () {
         that._write();
     });
 
-    if (this._pcmBuffers.length <= this._lowWaterMark &&
-    this._waterMarkStatus !== 'drained'
+    if (
+        this._pcmBuffers.length <= this._lowWaterMark &&
+        this._waterMarkStatus !== 'drained'
     ) {
         this._waterMarkStatus = 'drained';
         this.emit('drain');
