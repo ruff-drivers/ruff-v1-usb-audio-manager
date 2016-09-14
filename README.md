@@ -2,51 +2,45 @@
 
 This module provides usb audio device capture and playback feature for Ruff.
 
-##Supported Engines
+## Supported Engines
 
-* Ruff: >=1.4.0 <1.5.0
+* Ruff: >=1.5.0 <1.6.0
 
 
-## Installing
-Execute following command to install
+## Installation
+
+Run the following command to install module:
 
 ```
-rap init
 rap install ruff-v1-usb-audio-manager
 ```
 
+## Usage
 
-##Usage
+### Installing a manager
 
-Audio Driver has 2 working mode, Capture mode and Playback mode. Capture mode read data from audio device, and Playback mode write data to audio device.
+Audio driver has 2 working modes: Capture and Playback. Capture mode reads data from audio device, and Playback mode writes data into audio device. The mode to use is based on your application.
 
-For initialize the hardware correctly, there is an AudioCaptureManager and an AudioPlayerManager to help you, Manager objects should be installed before.
+Audio driver is based on [USB Manager](https://rap.ruff.io/raps/usb-manager). You need to install the corresponding manager to USB before your usage.
 
 ```
-var AudioCaptureManager = require('ruff-v1-usb-audio-manager').CaptureManager;
-var AudioPlayerManager = require('ruff-v1-usb-audio-manager').PlayerManager;
+var audioManager = require('ruff-v1-usb-audio-manager');
 
-var captureManager = new AudioCaptureManager();
-var playerManager = new AudioPlayerManager();
+var captureManager = new audioManager.CaptureManager();
+var playerManager = new audioManager.PlayerManager();
 
 $('#usb').install(captureManager, playerManager);
-
-
 ```
 
+### Capture mode
 
-###Capture mode
-
-When usb audio device mount, CaptureManager will help you create capturer object automatically. The example show you how to record voice to a file last for 5 seconds.
+With Capture mode, the manager will create a capturer when an USB audio device is mounted. The following example shows how to record 5 seconds voice into a file.
 
 ```
 var sampleFile = '/tmp/test.mono.pcm';
 
 captureManager.on('mount', function (capturer) {
-    console.log('AudioCard Capturer mount');
     $('#button-k2').on('push', function () {
-        console.log('button-k2 push');
-
         var fd = fs.openSync(sampleFile, 'w');
         var offset = 0;
 
@@ -71,14 +65,12 @@ captureManager.on('mount', function (capturer) {
 
 ```
 
-###Playback mode
+### Playback mode
 
-When usb audio device mount, playerManager will help you create player object automatically. The example show you how to play the voice from a file.
+With Playback mode, the manager will create a player when an USB audio device is mounted. The following example shows how to play the voice from a file.
 
 ```
 playerManager.on('mount', function (player) {
-    console.log('AudioCard Player mount');
-
     $('#button-k3').on('push', function () {
         console.log('button-k3 push');
 
@@ -109,16 +101,15 @@ playerManager.on('mount', function (player) {
 });
 ```
 
+## API Reference
 
-##API References
-
-###Options
+### Options
 
 The typical options example should like this:
 
 ```
 options = {
-    card : '0,0', 
+    card : '0,0',
     channels : 2,
     rate : 44100,
     bits : 16
@@ -132,55 +123,52 @@ options = {
 
 Options is the user media parameters, for example, your play voice is 44100Hz, 2channels, 16bits wav file, then options should be seted as it. If audio hardware not support the media parameters, it would throw an exception.
 
-###Capture mode
+### Capture mode
 
-####Methods
+#### Methods
 
-
-####`Capture(options)`
+#### `Capture(options)`
 Create a capturer object.
 
-####`start(options)`
+#### `start(options)`
 Start to read data from audio device continuously, until call stop()
 
-####`stop()`
+#### `stop()`
 Stop to capture data, until call start().
 
-####`close()`
+#### `close()`
 close audio device, and can not start anymore. For restart to read, you should create a other Capture object.
 
 ####Events
-####`data`
+#### `data`
 
 Hardware read audio data is asynchronous, once get enought data, will emit data event and trigger callback with audio data as an argument.
 
+### Playback mode
+#### Methods
 
-###Playback mode
-####Methods
-
-####`Playback(options)`
+#### `Playback(options)`
 Create a player object.
 
 
-####`feed(buffer)`
+#### `feed(buffer)`
 feed buffer data to player object.
 
-####`close()`
+#### `close()`
 
 Close audio device, and can not start anymore. For restart to write, you should create a other player object.
 
-####Events
-####`drain`
+#### Events
+#### `drain`
 
 If there is no more data feed to player for a long time, it will emit drain event once, and you should better trigger outer feed object to give more data to writer.
 
 
-####`full`
+#### `full`
 
 If you put too much data to player, it will emit full event once, and it suggests you stop feed data to player temporarily. However, it just a suggestion to stop, not necessary.
 
-
-##Contributing
+## Contributing
 
 Contributions to this project are warmly welcome. But before you open a pull request, please make sure your changes are passing code linting and tests.
 
