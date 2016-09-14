@@ -7,7 +7,29 @@
 var fs = require('fs');
 
 var soundCheckPath = '/sound';
-var cardNamePattern = /card[0-9]+/;
+var cardDirPattern = /card[0-9]+/;
+
+function getCardDir(checkedPath, cardDirPattern) {
+    var items = fs.readdirSync(checkedPath);
+    for (var i = 0; i < items.length; i++) {
+        if (cardDirPattern.test(items[i])) {
+            return items[i];
+        }
+    }
+    return null;
+}
+
+function getCardName(checkedPath, cardDir, devNamePattern) {
+    var soundPath = checkedPath + '/' + cardDir;
+    var items = fs.readdirSync(soundPath);
+    for (var i = 0; i < items.length; i++) {
+        var result = devNamePattern.exec(items[i]);
+        if (result !== null) {
+            return result[1] + ',' + result[2];
+        }
+    }
+    return null;
+}
 
 function checkAvailable(devPath, pcmDevNamePattern) {
     var checkedPath = devPath + soundCheckPath;
@@ -17,26 +39,11 @@ function checkAvailable(devPath, pcmDevNamePattern) {
         return null;
     }
 
-    var cardName = null;
-    var items = fs.readdirSync(checkedPath);
-    for (var i = 0; i < items.length; i++) {
-        if (cardNamePattern.test(items[i])) {
-            cardName = items[i];
-        }
-    }
-    if (cardName === null) {
+    var cardDir = getCardDir(checkedPath, cardDirPattern);
+    if (cardDir === null) {
         return null;
     }
-
-    var soundPath = checkedPath + '/' + cardName;
-    items = fs.readdirSync(soundPath);
-    for (var j = 0; j < items.length; j++) {
-        var result = pcmDevNamePattern.exec(items[j]);
-        if (result !== null) {
-            return result[1] + ',' + result[2];
-        }
-    }
-    return null;
+    return getCardName(checkedPath, cardDir, pcmDevNamePattern);
 }
 
 exports.checkAvailable = checkAvailable;
