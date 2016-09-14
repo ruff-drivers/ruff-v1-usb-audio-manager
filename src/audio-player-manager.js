@@ -5,7 +5,7 @@
 'use strict';
 
 var usbDevice = require('usb-manager');
-var checkAvailable = require('manager-helper').checkAvailable;
+var checkAvailable = require('./manager-helper').checkAvailable;
 var AudioPlayer = require('./audioPlayer');
 
 var DRIVER_NAME = 'snd_usb_audio';
