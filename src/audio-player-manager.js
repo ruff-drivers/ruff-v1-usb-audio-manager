@@ -6,7 +6,7 @@
 
 var usbDevice = require('usb-manager');
 var checkAvailable = require('./manager-helper').checkAvailable;
-var AudioPlayer = require('./audioPlayer');
+var AudioPlayer = require('./audio-player');
 
 var DRIVER_NAME = 'snd_usb_audio';
 var playerNamePattern = /pcmC([0-9]+)D([0-9])p/;
@@ -29,10 +29,10 @@ module.exports = usbDevice({
             callback && callback(error);
         }
     },
-    createDevice: function (devPath) {
+    createDevice: function (devPath, options) {
         var devInfo = checkAvailable(devPath, playerNamePattern);
         if (devInfo !== null) {
-            return new AudioPlayer({
+            return options.audioDevice || new AudioPlayer({
                 dev: devInfo
             });
         }
