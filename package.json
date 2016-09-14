@@ -28,7 +28,7 @@
         "install-rap-dependencies": "rap install",
         "lint": "eslint .",
         "pretest": "npm run lint",
-        "test": "find test -name 'test*.js' | xargs ruff"
+        "test": "ruff test/test-runner.js"
     },
     "devDependencies": {
         "eslint": "^2.13.1",
@@ -40,7 +40,7 @@
             "t": "^0.1.7"
         },
         "dependencies": {
-            "usb-manager": "^0.1.0"
+            "usb-manager": "git+https://github.com/ruff-drivers/usb-manager"
         }
     }
 }
