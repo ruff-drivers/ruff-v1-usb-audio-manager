@@ -28,5 +28,3 @@ describe('Test for Manager helper of Audio Device', function () {
         done();
     });
 });
-
-require('test').run(exports);

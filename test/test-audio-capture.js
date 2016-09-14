@@ -113,5 +113,3 @@ describe('Test for Capture Driver of Audio Device', function () {
         done();
     });
 });
-
-require('test').run(exports);

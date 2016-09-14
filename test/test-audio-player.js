@@ -93,5 +93,3 @@ describe('Test for Playback Driver of Audio Device', function () {
         done();
     });
 });
-
-require('test').run(exports);
