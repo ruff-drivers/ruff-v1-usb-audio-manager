@@ -6,6 +6,6 @@
 'use strict';
 
 module.exports = {
-    CaptureManager: require('./audio-capture-manager'),
+    CapturerManager: require('./audio-capturer-manager'),
     PlayerManager: require('./audio-player-manager')
 };
