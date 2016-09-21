@@ -8,7 +8,7 @@ var assert = require('assert');
 var mock = require('ruff-mock');
 var path = require('path');
 
-var CaptureManager = require('../src/audio-capture-manager');
+var CapturerManager = require('../src/audio-capturer-manager');
 
 var any = mock.any;
 var anyMock = mock.anyMock;
@@ -22,7 +22,7 @@ describe('Test for Capture Driver of Audio Device', function () {
     var context = {};
     beforeEach(function () {
         context.kernelModule = anyMock();
-        manager = new CaptureManager();
+        manager = new CapturerManager();
     });
 
     it('should trigger install method when call attach', function (done) {
@@ -41,7 +41,7 @@ describe('Test for Capture Driver of Audio Device', function () {
     it('should get AudioCapture object when call createDevice', function (done) {
         var audioDevice = anyMock();
         var devPath = path.join(__dirname, 'dev');
-        manager = new CaptureManager({ audioDevice: audioDevice });
+        manager = new CapturerManager({ audioDevice: audioDevice });
         manager.on('mount', function (capturer) {
             assert.deepEqual(capturer, audioDevice);
             done();
@@ -52,7 +52,7 @@ describe('Test for Capture Driver of Audio Device', function () {
     it('should not emit mount event when give invalid devPath', function (done) {
         var audioDevice = anyMock();
         var devPath = path.join(__dirname, 'dev_');
-        manager = new CaptureManager({ audioDevice: audioDevice });
+        manager = new CapturerManager({ audioDevice: audioDevice });
         manager.on('mount', function () {
             assert(false);
         });

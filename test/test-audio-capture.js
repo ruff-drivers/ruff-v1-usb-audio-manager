@@ -8,7 +8,7 @@
 var assert = require('assert');
 var mock = require('ruff-mock');
 
-var AudioCapture = require('../src/audio-capture');
+var AudioCapturer = require('../src/audio-capturer');
 
 var any = mock.any;
 var anyMock = mock.anyMock;
@@ -32,7 +32,7 @@ describe('Test for Capture Driver of Audio Device', function () {
 
     beforeEach(function () {
         alsaMock = anyMock();
-        capturer = new AudioCapture(pcmOptions, alsaMock);
+        capturer = new AudioCapturer(pcmOptions, alsaMock);
     });
 
     afterEach(function () {
@@ -52,7 +52,7 @@ describe('Test for Capture Driver of Audio Device', function () {
         when(_alsa).open(any, any, any, any, any).thenThrow(new Error('error'));
 
         assert.throws(function () {
-            var capturer = new AudioCapture(pcmOptions, _alsa);
+            var capturer = new AudioCapturer(pcmOptions, _alsa);
             capturer.start();
         }, Error);
         done();
