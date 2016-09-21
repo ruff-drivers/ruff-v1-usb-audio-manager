@@ -26,10 +26,10 @@ Audio driver is based on [USB Manager](https://rap.ruff.io/raps/usb-manager). Yo
 ```
 var audioManager = require('ruff-v1-usb-audio-manager');
 
-var captureManager = new audioManager.CaptureManager();
+var capturerManager = new audioManager.CapturerManager();
 var playerManager = new audioManager.PlayerManager();
 
-$('#usb').install(captureManager, playerManager);
+$('#usb').install(capturerManager, playerManager);
 ```
 
 ### Capture mode
@@ -39,7 +39,7 @@ With Capture mode, the manager will create a capturer when an USB audio device i
 ```
 var sampleFile = '/tmp/test.mono.pcm';
 
-captureManager.on('mount', function (capturer) {
+capturerManager.on('mount', function (capturer) {
     $('#button-k2').on('push', function () {
         var fd = fs.openSync(sampleFile, 'w');
         var offset = 0;
@@ -127,7 +127,7 @@ Options is the user media parameters, for example, your play voice is 44100Hz, 2
 
 #### Methods
 
-#### `Capture(options)`
+#### `Capturer(options)`
 Create a capturer object.
 
 #### `start(options)`
