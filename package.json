@@ -1,6 +1,6 @@
 {
     "name": "ruff-v1-usb-audio-manager",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Provides audio device capture and playback feature for Ruff.",
     "author": "Nanchao Inc.",
     "license": "MIT",
@@ -18,7 +18,7 @@
     ],
     "main": "src/index.js",
     "engines": {
-        "ruff": ">=1.5.0 <1.6.0"
+        "ruff": ">=1.5.0 <1.7.0"
     },
     "boards": {
         "ruff-mbd-v1": "^4.1.0"
