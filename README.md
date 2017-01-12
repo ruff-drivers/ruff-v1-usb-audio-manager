@@ -4,7 +4,7 @@ This module provides usb audio device capture and playback feature for Ruff.
 
 ## Supported Engines
 
-* Ruff: >=1.5.0 <1.7.0
+* Ruff: >=1.5.0 <2.0.0
 
 
 ## Installation
